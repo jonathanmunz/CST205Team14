@@ -1,7 +1,9 @@
+#! /usr/bin/env python
 
 
 #CALCULATOR
 import sys
+import math
 from PyQt5.QtWidgets import (QApplication, QWidget, QLabel, QVBoxLayout,
                             QHBoxLayout, QPushButton, QComboBox, QTextEdit, QSlider,QGridLayout,QMainWindow)
 from PyQt5.QtCore import pyqtSlot, Qt
@@ -9,7 +11,6 @@ import numpy as np
 import threading
 from collections import deque
 from functools import partial
-#from pygame import mixer
 
 
 
@@ -19,16 +20,12 @@ class calcGui(QMainWindow): # QMainWindow Class for the calculator GUI
 
     def __init__(self):
         super().__init__()
-        #mixer.init()
         #self.setStyleSheet(open('css/style.css').read())
         self.model = evaluateProblem
         self.cc = CalcController(self.model, self)
 
         # Set Main Window Title
         self.setWindowTitle("Calculator")
-        # self.drawing_message = QLabel("These are the coloring options:")
-        # self.other_message = QLabel("These are all the other options:")
-        
         #Setting the main widget and the layout that will be used for the calculator
         self.mainWidget = QWidget(self)
         self.setCentralWidget(self.mainWidget)
@@ -73,7 +70,7 @@ class calcGui(QMainWindow): # QMainWindow Class for the calculator GUI
         self.choose_theme = QComboBox()
         self.choose_theme.setFixedHeight(40)
         self.choose_theme.addItems(calcTheme)
-        self.choose_theme.currentIndexChanged.connect(self.calc_chosen)
+        self.choose_theme.currentIndexChanged.connect(self.theme_chosen)
         self.colorDropDown.addWidget(self.selectColorLabel)
         self.colorDropDown.addWidget(self.choose_theme)
         self.selectionLayout.addLayout(self.colorDropDown)
@@ -92,6 +89,18 @@ class calcGui(QMainWindow): # QMainWindow Class for the calculator GUI
         self.mainLayout.addWidget(self.display)
 
     @pyqtSlot()
+    def theme_chosen(self):
+        themeChosen = self.choose_theme.currentText()
+        
+        if(themeChosen == '1'):
+            self.setStyleSheet(open('css/style.css').read())
+            
+        elif themeChosen == '2':
+            self.setStyleSheet(open('css/style2.css').read())
+
+
+
+    @pyqtSlot()
     def calc_chosen(self):
         calcChosen = self.choose_calc.currentText()
         
@@ -103,6 +112,8 @@ class calcGui(QMainWindow): # QMainWindow Class for the calculator GUI
             self.createBasicButtons()
         elif calcChosen == 'Scientific':
             self.setWindowTitle('Scientific Calculator')
+            self.destroyButtons()
+            self.createScientificButtons()
         elif calcChosen == 'Subnet':
             self.setWindowTitle('Subnet Calculator')
             self.display.setFixedHeight(180)
@@ -208,7 +219,46 @@ class calcGui(QMainWindow): # QMainWindow Class for the calculator GUI
         self.cc.connectButtons()
         self.buttons["="].clicked.connect(self.cc._calculateResult)
 
+    @pyqtSlot()
+    def createScientificButtons(self):
+        """Create the buttons."""
+        self.buttons = {}
+        #buttonsGrid = QGridLayout()
+        # Button text | position on the QGridLayout
+        buttons = {
+            "7": (0, 0),
+            "8": (0, 1),
+            "9": (0, 2),
+            "sin": (0,3),
+            "/": (0, 4),
+            "C": (0, 5),
+            "4": (1, 0),
+            "5": (1, 1),
+            "6": (1, 2),
+            "cos": (1,3),
+            "*": (1, 4),
+            "(": (1, 5),
+            "1": (2, 0),
+            "2": (2, 1),
+            "3": (2, 2),
+            "tan": (2,3),
+            "-": (2, 4),
+            ")": (2, 5),
+            "0": (3, 0),
+            "00": (3, 1),
+            ".": (3, 2),
+            "^": (3,3),
+            "+": (3, 4),
+            "=": (3, 5),
+        }
+        # Create the buttons and add them to the button grid layout
+        for btnText, pos in buttons.items():
+            self.buttons[btnText] = QPushButton(btnText)
+            self.buttons[btnText].setFixedSize(80, 80)
+            self.buttonsGrid.addWidget(self.buttons[btnText], pos[0], pos[1])
             
+        self.cc.connectButtons()
+        self.buttons["="].clicked.connect(self.cc._calculateResult)
         
     @pyqtSlot()
     def createSubnetButtons(self):
@@ -494,7 +544,7 @@ class CalcController:
             screenText += (str(octet4-1))
 
             print("\nSubnet Broadcast Address: ", end ='')
-            screenText += ("\Subnet Broadcast Address: ")
+            screenText += ("\nSubnet Broadcast Address: ")
             for x in range (0,2):
                 print(subnetAddress[x], end = ".")
                 screenText += (str(subnetAddress[x])+'.')
@@ -566,7 +616,7 @@ class CalcController:
             print(octet3, end = ".")
             screenText += (str(octet3)+'.')
             print(octet4, end ="\n")
-            screenText += (str(octet4)+"\n")
+            screenText += (str(octet4))
 
             #Make sure the ipAddress isnt the broadcast address
             if(octet4 == ipAddress[len(subnetAddress) -2]):
@@ -607,7 +657,7 @@ class CalcController:
 def evaluateProblem(expression):
     """Evaluate an expression."""
     try:
-        result = str(eval(expression, {}, {}))
+        result = str(eval(expression))
     except Exception:
         result = ERROR_MSG
 
