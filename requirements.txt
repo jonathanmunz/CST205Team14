@@ -1,1 +1,2 @@
-Install PyQT5
+Perform the following:
+pip install pyQT5
