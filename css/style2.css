@@ -1,16 +1,21 @@
 QLabel{
-  color: white;
+  color: #1258DC;
   font-size: 40px;
 }
 
+QMainWindow {
+  background-color: #FB8604;
+}
+
 QPushButton {
-  color: white;
+  color: #FB8604;
   padding: 10px;
+  font-size: 20pt;
   border-style: outset;
   border-color: white;
   border-radius: 10px;
   border-width: 2px;
-  background-color: rgb(150, 0, 0);
+  background-color: #1258DC;
 }
 
 QPushButton:hover{
@@ -20,13 +25,25 @@ QPushButton:hover{
 }
 
 QComboBox {
-  color: white;
+  color: #1258DC;
   padding: 10px;
   border-style: outset;
   border-color: white;
   border-radius: 10px;
   border-width: 2px;
-  background-color: rgb(0, 0, 0);
+  background-color: #F7E7D4;
+}
+
+QComboBox::drop-down {
+    subcontrol-origin: padding;
+    subcontrol-position: top right;
+    width: 15px;
+
+    border-left-width: 1px;
+    border-left-color: darkgray;
+    border-left-style: solid; /* just a single line */
+    border-top-right-radius: 3px; /* same radius as the QComboBox */
+    border-bottom-right-radius: 3px;
 }
 
 QComboBox:hover{

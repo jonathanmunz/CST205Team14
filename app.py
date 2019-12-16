@@ -7,7 +7,7 @@ import math
 from PyQt5.QtWidgets import (QApplication, QWidget, QLabel, QVBoxLayout,
                             QHBoxLayout, QPushButton, QComboBox, QTextEdit, QSlider,QGridLayout,QMainWindow)
 from PyQt5.QtCore import pyqtSlot, Qt
-import numpy as np
+#import numpy as np
 import threading
 from collections import deque
 from functools import partial
@@ -65,8 +65,8 @@ class calcGui(QMainWindow): # QMainWindow Class for the calculator GUI
         
         #dropdown for color theme
         self.colorDropDown = QVBoxLayout()
-        self.selectColorLabel = QLabel("Select Color")
-        calcTheme = ["1", "2", "3", "4"]
+        self.selectColorLabel = QLabel("Select Theme")
+        calcTheme = ["Default", "Peanut Butter Mood", "Orange Berry Blitz!", "Watermelon Breeze", "Razzmatazz", "BananaBerry"]
         self.choose_theme = QComboBox()
         self.choose_theme.setFixedHeight(40)
         self.choose_theme.addItems(calcTheme)
@@ -90,13 +90,26 @@ class calcGui(QMainWindow): # QMainWindow Class for the calculator GUI
 
     @pyqtSlot()
     def theme_chosen(self):
+        calcChosen = self.choose_calc.currentText()
         themeChosen = self.choose_theme.currentText()
         
-        if(themeChosen == '1'):
+        if(themeChosen == 'Default'):
+            self.setStyleSheet("")
+            
+        elif(themeChosen == 'Peanut Butter Mood'):
             self.setStyleSheet(open('css/style.css').read())
             
-        elif themeChosen == '2':
+        elif themeChosen == 'Orange Berry Blitz!':
             self.setStyleSheet(open('css/style2.css').read())
+            
+        elif themeChosen == 'Watermelon Breeze':
+            self.setStyleSheet(open('css/style3.css').read())
+            
+        elif themeChosen == 'Razzmatazz':
+            self.setStyleSheet(open('css/style4.css').read())
+        
+        elif themeChosen == 'BananaBerry':
+            self.setStyleSheet(open('css/style5.css').read())
 
 
 
@@ -109,16 +122,20 @@ class calcGui(QMainWindow): # QMainWindow Class for the calculator GUI
             self.setWindowTitle('Basic Calculator')
             self.display.setFixedHeight(60)
             self.destroyButtons()
+            self.clearDisplay()
             self.createBasicButtons()
+            
         elif calcChosen == 'Scientific':
             self.setWindowTitle('Scientific Calculator')
             self.destroyButtons()
+            self.clearDisplay()
             self.createScientificButtons()
         elif calcChosen == 'Subnet':
             self.setWindowTitle('Subnet Calculator')
             self.display.setFixedHeight(180)
             self.destroyButtons()
             self.createSubnetButtons()
+            self.clearDisplay()
             
             
             
@@ -128,7 +145,8 @@ class calcGui(QMainWindow): # QMainWindow Class for the calculator GUI
         
     def getDisplayText(self):
         """Get display's text."""
-        return self.display.toPlainText()
+        displayText = self.display.toPlainText()
+        return displayText
 
     def clearDisplay(self):
         """Clear the display."""
@@ -226,30 +244,37 @@ class calcGui(QMainWindow): # QMainWindow Class for the calculator GUI
         #buttonsGrid = QGridLayout()
         # Button text | position on the QGridLayout
         buttons = {
-            "7": (0, 0),
-            "8": (0, 1),
-            "9": (0, 2),
-            "sin": (0,3),
-            "/": (0, 4),
-            "C": (0, 5),
-            "4": (1, 0),
-            "5": (1, 1),
-            "6": (1, 2),
-            "cos": (1,3),
-            "*": (1, 4),
-            "(": (1, 5),
-            "1": (2, 0),
-            "2": (2, 1),
-            "3": (2, 2),
-            "tan": (2,3),
-            "-": (2, 4),
-            ")": (2, 5),
-            "0": (3, 0),
-            "00": (3, 1),
-            ".": (3, 2),
-            "^": (3,3),
-            "+": (3, 4),
-            "=": (3, 5),
+            "π": (0,0),
+            "√": (0,1),
+            "log": (0,2),
+            "ln": (0,3),
+            "e": (0,4),
+            "%": (0,5),
+            "7": (1, 0),
+            "8": (1, 1),
+            "9": (1, 2),
+            "sin": (1,3),
+            "/": (1, 4),
+            "C": (1, 5),
+            "4": (2, 0),
+            "5": (2, 1),
+            "6": (2, 2),
+            "cos": (2,3),
+            "*": (2, 4),
+            "(": (2, 5),
+            "1": (3, 0),
+            "2": (3, 1),
+            "3": (3, 2),
+            "tan": (3,3),
+            "-": (3, 4),
+            ")": (3, 5),
+            "0": (4, 0),
+            "00": (4, 1),
+            ".": (4, 2),
+            "^": (4,3),
+            "+": (4, 4),
+            "=": (4, 5),
+            
         }
         # Create the buttons and add them to the button grid layout
         for btnText, pos in buttons.items():
@@ -259,6 +284,7 @@ class calcGui(QMainWindow): # QMainWindow Class for the calculator GUI
             
         self.cc.connectButtons()
         self.buttons["="].clicked.connect(self.cc._calculateResult)
+        #self.buttons
         
     @pyqtSlot()
     def createSubnetButtons(self):
@@ -280,7 +306,7 @@ class calcGui(QMainWindow): # QMainWindow Class for the calculator GUI
             "2": (2, 1),
             "3": (2, 2),
             ".": (2, 3),
-            "SUBNET": (2, 4),
+            "GO!": (2, 4),
         }
         # Create the buttons and add them to the button grid layout
         for btnText, pos in buttons.items():
@@ -289,7 +315,7 @@ class calcGui(QMainWindow): # QMainWindow Class for the calculator GUI
             self.buttonsGrid.addWidget(self.buttons[btnText], pos[0], pos[1])
             
         self.cc.connectButtons()
-        self.buttons["SUBNET"].clicked.connect(self.cc._subnetResult)
+        self.buttons["GO!"].clicked.connect(self.cc._subnetResult)
 
 
 
@@ -309,7 +335,7 @@ class CalcController:
         
     def connectButtons(self):
         for btnText, btn in self.mainView.buttons.items():
-            if btnText not in {"=", "C", "SUBNET"}:
+            if btnText not in {"=", "C", "GO!"}:
                 btn.clicked.connect(partial(self._buildExpression, btnText))
                 
         #self.mainView.display.returnPressed.connect(self._calculateResult)
@@ -640,7 +666,31 @@ class CalcController:
                 
     def _calculateResult(self):
         """Evaluate expressions."""
-        result = self.evaluateProblem(expression=self.mainView.getDisplayText())
+        expression=self.mainView.getDisplayText()
+        
+        if '^' in expression:
+            expression = expression.replace("^", ", ")
+            expression = "math.pow(" + expression + ")"
+        
+        if 'sin' in expression:
+            expression = expression.replace("sin", "math.sin")
+        if 'cos' in expression:
+            expression = expression.replace("cos", "math.cos")
+        if 'tan' in expression:
+            expression = expression.replace("tan", "math.tan")
+        if 'π' in expression:
+            expression = expression.replace("π", "math.pi")
+        if '√' in expression:
+            expression = expression.replace("√", "math.sqrt")
+        if 'log' in expression:
+            expression = expression.replace("log", "math.log10")
+        if 'ln' in expression:
+            expression = expression.replace("ln", "math.log1p")
+        if 'e' in expression:
+            expression = expression.replace("e", "math.e")
+            
+                
+        result = self.evaluateProblem(expression)
         self.mainView.setDisplayText(result)
 
     def _buildExpression(self, sub_exp):
